@@ -18,16 +18,8 @@ $app = require __DIR__.'/bootstrap/app.php';
 /** @var Database $database */
 $database = $app->make(Database::class);
 
-$stmt = $database->getConnection()->prepare('SELECT * FROM user_newsletter');
-$stmt->execute(); // Выполняем запрос
-$result = $stmt->fetchAll(PDO::FETCH_ASSOC); // Получаем все строки в виде ассоциативного массива
-
-die(print_r($result));
-
-// Путь к папке с SQL скриптами
 $sqlDir = __DIR__.'/sql';
 
-// Проверяем, существует ли папка и читаем файлы
 if (!is_dir($sqlDir)) {
     echo "Папка с SQL скриптами не найдена.\n";
     exit(1);
@@ -40,27 +32,22 @@ if (empty($sqlFiles)) {
     exit(1);
 }
 
-// Выводим все имена файлов в консоль
 echo "Доступные SQL скрипты:\n";
 foreach ($sqlFiles as $index => $fileName) {
     echo "[$index] $fileName\n";
 }
 
-// Просим пользователя выбрать скрипт
 echo "Выберите номер скрипта для выполнения: ";
 $input = trim(fgets(STDIN));
 
-// Проверяем ввод пользователя
 if (!isset($sqlFiles[$input])) {
     echo "Неправильный выбор. Скрипт не найден.\n";
     exit(1);
 }
 
-// Получаем выбранное имя файла
 $selectedFile = $sqlFiles[$input];
 echo "Вы выбрали: $selectedFile\n";
 
-// Полный путь к выбранному файлу
 $selectedFilePath = $sqlDir.'/'.$selectedFile;
 echo "Полный путь к файлу: $selectedFilePath\n";
 
@@ -70,9 +57,9 @@ if ($sqlScript === false) {
     echo "Не удалось прочитать содержимое файла.\n";
     exit(1);
 }
-// Выполняем скрипт через класс Database
+
 try {
-    $database->getConnection()->exec($sqlScript); // Выполняем SQL скрипт
+    $database->getConnection()->exec($sqlScript);
 
     echo "Скрипт успешно выполнен.\n";
 } catch (Exception $e) {

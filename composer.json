@@ -14,11 +14,6 @@
       "WaHelp\\Core\\": "core/"
     }
   },
-  "autoload-dev": {
-    "psr-4": {
-      "WaHelp\\Newsletter\\Tests\\": "tests/"
-    }
-  },
   "require": {
     "php": "8.2",
     "ext-pdo": "*"
