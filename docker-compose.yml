@@ -3,7 +3,11 @@ services:
   wahelp:
     build: ./
     volumes:
-      - ./:/src
+      - ./bootstrap:/src/bootstrap
+      - ./core:/src/core
+      - ./src:/src/src
+      - ./public:/src/public
+      - ./sql:/src/sql
     ports:
       - 8082:80
     environment:

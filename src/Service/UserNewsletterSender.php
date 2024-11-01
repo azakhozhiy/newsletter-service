@@ -24,13 +24,12 @@ class UserNewsletterSender
         $userIterator = (new IntervalIterator(
             $this->database,
             'users'
-        ))->setStep(1000);
+        ))->setStep(5000);
 
         $userIterator->next();
 
-        $userIds = [];
         $sentCount = 0;
-        $batchSize = 500;
+        $batchSize = 5000;
 
         foreach ($userIterator as $users) {
             foreach ($users as $user) {
@@ -68,9 +67,19 @@ class UserNewsletterSender
 
             $userIdsToProcess = array_diff($userIds, $existingUserIds);
 
+            $records = [];
+
             foreach ($userIdsToProcess as $userId) {
+                $records[] = [
+                    'user_id' => $userId,
+                    'newsletter_id' => $newsletter->getId(),
+                ];
+
                 $this->dispatchJob($newsletter, $userId);
             }
+
+            // Save history
+            $this->userNewsletterRepository->insertBatch($records, ['user_id', 'newsletter_id']);
         } catch (Throwable $e) {
             if ($retryCount + 1 === $this->maxRetryCount) {
                 throw new RuntimeException("Retry limit reached.", 0, $e);
@@ -83,10 +92,6 @@ class UserNewsletterSender
 
     private function dispatchJob(Newsletter $newsletter, int $userId): void
     {
-        // Push task to RabbitMQ
-        $this->userNewsletterRepository->insertOne([
-            'user_id' => $userId,
-            'newsletter_id' => $newsletter->getId(),
-        ]);
+        // Some async task
     }
 }

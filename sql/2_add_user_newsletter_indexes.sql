@@ -1,0 +1,1 @@
+CREATE INDEX idx_newsletter_user ON user_newsletter (newsletter_id, user_id);
